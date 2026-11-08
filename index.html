@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Apprendre les tables de multiplication en jouant, sans compte ni publicité.">
+<meta name="theme-color" content="#2b2350">
+<title>Tables Magiques</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-world="foret">
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<main id="app">
+  <!-- Choix du monde -->
+  <section id="s-world" class="screen" hidden aria-labelledby="h-world">
+    <div class="topbar">
+      <button class="icon-btn" id="btn-world-back" type="button" aria-label="Retour à l'accueil" hidden>←</button>
+      <h1 id="h-world" tabindex="-1">Choisis ton monde</h1>
+      <span class="icon-btn ghost" aria-hidden="true"></span>
+    </div>
+    <div class="choices" id="world-choices"></div>
+  </section>
+
+  <!-- Choix du compagnon -->
+  <section id="s-companion" class="screen" hidden aria-labelledby="h-companion">
+    <div class="topbar">
+      <button class="icon-btn" id="btn-comp-back" type="button" aria-label="Retour au choix du monde">←</button>
+      <h1 id="h-companion" tabindex="-1">Choisis ton compagnon</h1>
+      <span class="icon-btn ghost" aria-hidden="true"></span>
+    </div>
+    <div class="choices" id="companion-choices"></div>
+  </section>
+
+  <!-- Accueil -->
+  <section id="s-home" class="screen" hidden aria-labelledby="h-home">
+    <h1 id="h-home" class="sr-only" tabindex="-1">Accueil</h1>
+    <div class="companion-zone">
+      <div class="bubble-talk" id="home-talk"></div>
+      <div class="companion big" id="home-companion" aria-hidden="true"></div>
+    </div>
+    <div class="progress-line" id="home-progress"></div>
+    <button class="btn btn-play" id="btn-play" type="button">▶&nbsp; Jouer</button>
+    <div class="row">
+      <button class="btn btn-soft" id="btn-collection" type="button">🎁 Mes trésors</button>
+      <button class="btn btn-soft" id="btn-world" type="button">🌍 Mon monde</button>
+    </div>
+    <button class="btn-link" id="btn-parent" type="button">Espace parent</button>
+  </section>
+
+  <!-- Jeu -->
+  <section id="s-game" class="screen" hidden aria-labelledby="h-game">
+    <div class="topbar">
+      <button class="icon-btn" id="btn-pause" type="button" aria-label="Pause, revenir à l'accueil">⏸</button>
+      <ol class="dots" id="dots" aria-label="Progression de la partie"></ol>
+      <button class="icon-btn" id="btn-say" type="button" aria-label="Réécouter la question">🔊</button>
+    </div>
+    <h1 id="h-game" class="sr-only" tabindex="-1">Partie</h1>
+    <div class="stage" id="stage"></div>
+  </section>
+
+  <!-- Fin de partie -->
+  <section id="s-end" class="screen" hidden aria-labelledby="h-end">
+    <h1 id="h-end" tabindex="-1">Bravo !</h1>
+    <div class="companion big" id="end-companion" aria-hidden="true"></div>
+    <p class="end-stars" id="end-stars"></p>
+    <div id="end-unlocks" class="unlocks"></div>
+    <p class="end-msg" id="end-msg"></p>
+    <div class="row">
+      <button class="btn btn-play small" id="btn-again" type="button">↻ Rejouer</button>
+      <button class="btn btn-soft" id="btn-end-home" type="button">🏠 Accueil</button>
+    </div>
+  </section>
+
+  <!-- Collection -->
+  <section id="s-collection" class="screen" hidden aria-labelledby="h-collection">
+    <div class="topbar">
+      <button class="icon-btn" id="btn-coll-back" type="button" aria-label="Retour à l'accueil">←</button>
+      <h1 id="h-collection" tabindex="-1">Mes trésors</h1>
+      <span class="icon-btn ghost" aria-hidden="true"></span>
+    </div>
+    <p class="hint" id="coll-count"></p>
+    <ul class="collection" id="collection"></ul>
+  </section>
+
+  <!-- Porte parent -->
+  <section id="s-gate" class="screen" hidden aria-labelledby="h-gate">
+    <h1 id="h-gate" tabindex="-1">Espace parent</h1>
+    <p class="hint">Maintiens le bouton appuyé 3 secondes.</p>
+    <button class="btn hold" id="btn-hold" type="button"><span class="hold-fill" id="hold-fill"></span><span class="hold-label">Maintenir</span></button>
+    <button class="btn-link" id="btn-gate-back" type="button">Retour</button>
+  </section>
+
+  <!-- Espace parent -->
+  <section id="s-parent" class="screen parent" hidden aria-labelledby="h-parent">
+    <div class="topbar">
+      <button class="icon-btn" id="btn-parent-back" type="button" aria-label="Retour à l'accueil">←</button>
+      <h1 id="h-parent" tabindex="-1">Espace parent</h1>
+      <span class="icon-btn ghost" aria-hidden="true"></span>
+    </div>
+    <div id="parent-warn" class="warn" hidden></div>
+    <p id="parent-summary"></p>
+    <h2>Où en est-elle ?</h2>
+    <div class="grid-wrap"><table class="grid" id="parent-grid"><caption class="sr-only">Résultats de 1×1 à 10×10 et leur état</caption></table></div>
+    <ul class="legend">
+      <li><span class="cell st-socle">✓</span> Socle (1, 2, 5, 10)</li>
+      <li><span class="cell st-maitrise">★</span> Maîtrisé</li>
+      <li><span class="cell st-retenu">✓</span> Retenu</li>
+      <li><span class="cell st-encours">●</span> En cours</li>
+      <li><span class="cell st-nouveau">○</span> Pas encore vu</li>
+      <li><span class="cell st-revoir">!</span> À revoir</li>
+    </ul>
+    <h2>Réglages</h2>
+    <div class="settings">
+      <label class="switch"><input type="checkbox" id="set-voice"> <span>Voix (lecture des questions)</span></label>
+      <label class="switch"><input type="checkbox" id="set-sound"> <span>Petits sons</span></label>
+      <label class="switch"><input type="checkbox" id="set-calm"> <span>Animations calmes</span></label>
+    </div>
+    <h2>Confidentialité</h2>
+    <p class="small-text">Les progrès restent sur cette tablette, dans la mémoire du navigateur, car c'est indispensable au jeu ; ils ne sont envoyés nulle part. Pas de compte, pas de publicité, pas de mesure d'audience, aucun prénom ni information personnelle. Comme tout site, l'hébergeur de la page (GitHub) voit l'adresse IP au chargement. La voix utilise le moteur de synthèse de la tablette. Vous pouvez tout effacer à tout moment.</p>
+    <button class="btn btn-danger" id="btn-reset" type="button">Tout effacer</button>
+    <div class="confirm" id="confirm-reset" hidden role="alertdialog" aria-labelledby="confirm-title">
+      <p id="confirm-title">Effacer tous les progrès et la collection ?</p>
+      <div class="row">
+        <button class="btn btn-danger" id="btn-reset-yes" type="button">Oui, effacer</button>
+        <button class="btn btn-soft" id="btn-reset-no" type="button">Annuler</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
